@@ -1,7 +1,7 @@
 from django.db.models import ObjectDoesNotExist
 from rest_framework import serializers
 
-from user.models import User, UserSubscribe
+from user.models import User
 from user.serializers import UserProfileSerializer
 from user.utils import is_subscribed
 from .fields import Base64ImageField

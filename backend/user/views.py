@@ -5,8 +5,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from recipe.serializers import UserFullDataSerializer
-from .models import User, UserSubscribe
+from .models import User
 from .serializers import UserCreateSerializer, UserProfileSerializer
+from .utils import post_delete_action
 
 
 class UserViewSet(DjoserUserViewSet):
@@ -39,25 +40,8 @@ class UserViewSet(DjoserUserViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        if request.method == 'POST':
-            _, create = UserSubscribe.objects.get_or_create(
-                user=request.user, author=author
-            )
-            if not create:
-                return Response(
-                    {'error': 'You already subscribe to this user'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            serializer = UserFullDataSerializer(author,
-                                                context={'request': request})
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        UserSubscribe.objects.filter(
-            user=request.user, author=author
-        ).delete()
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return post_delete_action(request, author, 'subscriptions',
+                                  UserFullDataSerializer)
 
     @action(detail=False, methods=['get'])
     def subscriptions(self, request):
