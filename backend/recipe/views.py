@@ -35,8 +35,7 @@ class RecipeViewSet(ModelViewSet):
 
         if request.method == 'POST':
             _, create = UserFavoriteRecipe.objects.get_or_create(
-                user=request.user,
-                recipe=recipe
+                user=request.user, recipe=recipe
             )
             if not create:
                 return Response(
@@ -49,8 +48,7 @@ class RecipeViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         UserFavoriteRecipe.objects.filter(
-            user=request.user,
-            recipe=recipe
+            user=request.user, recipe=recipe
         ).delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
