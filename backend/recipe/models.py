@@ -32,6 +32,11 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(Ingredient,
                                          through='RecipeIngredient')
 
+    # Хотел добавить эти поля в таблицу User, но ругается на циклический импорт
+    favorite_recipes = models.ManyToManyField(User,
+                                              related_name='favorite_recipes')
+    shopping_card = models.ManyToManyField(User, related_name='shopping_card')
+
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(Recipe,
@@ -41,10 +46,3 @@ class RecipeIngredient(models.Model):
                                    related_name='recipe_ingredient_model',
                                    on_delete=models.CASCADE)
     amount = models.IntegerField()
-
-
-class UserFavoriteRecipe(models.Model):
-    user = models.ForeignKey(User, related_name='favorite_recipe',
-                             on_delete=models.CASCADE)
-    recipe = models.ForeignKey(Recipe, related_name='favorite_recipe',
-                               on_delete=models.CASCADE)

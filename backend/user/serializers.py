@@ -25,6 +25,7 @@ class UserCreateSerializer(DjoserUserCreateSerializer):
 
 class UserProfileSerializer(DjoserUserSerializer):
     id = serializers.IntegerField(read_only=True)
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User

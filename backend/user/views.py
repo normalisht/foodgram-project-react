@@ -61,6 +61,6 @@ class UserViewSet(DjoserUserViewSet):
 
     @action(detail=False, methods=['get'])
     def subscriptions(self, request):
-        # get_serializer_class и get_queryset устанавливаются необходимые
-        # сериализатор и выборка
+        """Список подписок. В get_serializer_class и get_queryset
+        устанавливаются необходимые сериализатор и выборка."""
         return super().list(request)
