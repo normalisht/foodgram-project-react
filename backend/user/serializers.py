@@ -1,10 +1,14 @@
-from djoser.serializers import UserSerializer, UserCreateSerializer
+from djoser.serializers import (
+    UserSerializer as DjoserUserSerializer,
+    UserCreateSerializer as DjoserUserCreateSerializer
+)
 from rest_framework import serializers
 
-from user.models import User
+from .models import User
+from .utils import is_subscribed
 
 
-class CustomUserCreateSerializer(UserCreateSerializer):
+class UserCreateSerializer(DjoserUserCreateSerializer):
     id = serializers.IntegerField(read_only=True)
 
     class Meta:
@@ -19,10 +23,13 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         return email
 
 
-class CustomUserSerializer(UserSerializer):
+class UserProfileSerializer(DjoserUserSerializer):
     id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'first_name', 'last_name',)
-        # TODO Добавить поле 'is_subscribed'
+        fields = ('id', 'email', 'username', 'first_name', 'last_name',
+                  'is_subscribed')
+
+    def get_is_subscribed(self, author):
+        return is_subscribed(self.context['request'].user, author)

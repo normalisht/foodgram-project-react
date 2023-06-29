@@ -1,3 +1,6 @@
-from rest_framework import serializers
-from django.core.validators import validate_email as django_validate_email
+from .models import UserSubscribe
 
+
+def is_subscribed(user, author):
+    """Проверяет подписан ли user на author"""
+    return UserSubscribe.objects.filter(author=author, user=user).exists()

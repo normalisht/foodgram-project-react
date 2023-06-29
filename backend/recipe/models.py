@@ -9,6 +9,11 @@ class Tag(models.Model):
     slug = models.SlugField(max_length=32)
 
 
+class Ingredient(models.Model):
+    name = models.CharField(max_length=64)
+    measurement_unit = models.CharField(max_length=16)
+
+
 class Recipe(models.Model):
     author = models.ForeignKey(
         User,
@@ -23,9 +28,23 @@ class Recipe(models.Model):
     )
     text = models.TextField()
     cooking_time = models.IntegerField()
-    tags = models.ManyToManyField(Tag, through='RecipeTag')
+    tags = models.ManyToManyField(Tag)
+    ingredients = models.ManyToManyField(Ingredient,
+                                         through='RecipeIngredient')
 
 
-class Ingredient(models.Model):
-    name = models.CharField(max_length=64)
-    measurement_unit = models.CharField(max_length=16)
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(Recipe,
+                               related_name='recipe_ingredient_model',
+                               on_delete=models.CASCADE)
+    ingredient = models.ForeignKey(Ingredient,
+                                   related_name='recipe_ingredient_model',
+                                   on_delete=models.CASCADE)
+    amount = models.IntegerField()
+
+
+class UserFavoriteRecipe(models.Model):
+    user = models.ForeignKey(User, related_name='favorite_recipe',
+                             on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, related_name='favorite_recipe',
+                               on_delete=models.CASCADE)
