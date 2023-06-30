@@ -10,7 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
-from user.utils import post_delete_action
+from users.utils import post_delete_action
 from .models import Tag, Ingredient, Recipe, RecipeIngredient
 from .serializers import (TagSerializer, IngredientSerializer,
                           RecipeSerializer, RecipeShortSerializer, )

@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from recipe.serializers import UserFullDataSerializer
+from recipes.serializers import UserFullDataSerializer
 from .models import User
 from .serializers import UserCreateSerializer, UserProfileSerializer
 from .utils import post_delete_action

@@ -4,8 +4,8 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('api/', include('user.urls')),
-    path('api/', include('recipe.urls')),
+    path('api/', include('users.urls')),
+    path('api/', include('recipes.urls')),
     path('admin/', admin.site.urls),
 ]
 

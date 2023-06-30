@@ -22,8 +22,8 @@ INSTALLED_APPS = [
     'djoser',
     'rest_framework',
     'rest_framework.authtoken',
-    'user',
-    'recipe',
+    'users',
+    'recipes',
 ]
 
 MIDDLEWARE = [
@@ -94,7 +94,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -114,4 +114,4 @@ DJOSER = {
 }
 
 pdfmetrics.registerFont(TTFont('Manrope',
-                               BASE_DIR / 'recipe/fonts/Manrope.ttf'))
+                               BASE_DIR / 'recipes/fonts/Manrope.ttf'))
