@@ -35,7 +35,7 @@ class Recipe(models.Model):
     # Хотел добавить эти поля в таблицу User, но ругается на циклический импорт
     favorite_recipes = models.ManyToManyField(User,
                                               related_name='favorite_recipes')
-    shopping_card = models.ManyToManyField(User, related_name='shopping_card')
+    shopping_cart = models.ManyToManyField(User, related_name='shopping_cart')
 
 
 class RecipeIngredient(models.Model):

@@ -11,7 +11,7 @@ def is_subscribed(user, author):
 
 
 def post_delete_action(request, obj, related_name: str,
-                       serializer: Type[Serializer]):
+                       serializer_class: Type[Serializer]):
     """Реализует post и delete методы для связи многие-ко-многим.
     Связь многие-ко-многим между авторизированным пользователем и obj.
     "related_name" - название связующего поля в таблице User."""
@@ -25,7 +25,7 @@ def post_delete_action(request, obj, related_name: str,
                 status=status.HTTP_400_BAD_REQUEST
             )
         getattr(user, related_name).add(obj)
-        serializer = serializer(obj, context={'request': request})
+        serializer = serializer_class(obj, context={'request': request})
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 

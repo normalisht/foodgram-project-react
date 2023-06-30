@@ -1,6 +1,9 @@
 from datetime import timedelta
 from pathlib import Path
 
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-%juq@w-fxpo_*%5@xfbzt91j(&%2fuiu2&(e$23!&ld7m@xb=2'
@@ -109,3 +112,6 @@ REST_FRAMEWORK = {
 DJOSER = {
     'LOGIN_FIELD': 'email'
 }
+
+pdfmetrics.registerFont(TTFont('Manrope',
+                               BASE_DIR / 'recipe/fonts/Manrope.ttf'))
