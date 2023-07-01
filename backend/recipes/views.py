@@ -3,23 +3,23 @@ from datetime import datetime
 
 from django.db.models import Sum
 from django.http import FileResponse
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from rest_framework.decorators import action
-from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
+from rest_framework.filters import SearchFilter
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
 from users.permissions import IsAuthor, ReadOnly
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from users.utils import post_delete_action
+
 from .filters import RecipeFilter
-from .models import Tag, Ingredient, Recipe, RecipeIngredient
-from .serializers import (TagSerializer, IngredientSerializer,
-                          RecipeSerializer, RecipeShortSerializer, )
-from .utils import get_cached_date
+from .models import Ingredient, Recipe, RecipeIngredient, Tag
+from .serializers import (IngredientSerializer, RecipeSerializer,
+                          RecipeShortSerializer, TagSerializer)
 
 
 class RetrieveListViewSet(RetrieveModelMixin, ListModelMixin, GenericViewSet):
@@ -79,8 +79,8 @@ class RecipeViewSet(ModelViewSet):
 
         pdf.drawString(
             25, h - 35,
-            f"Список покупок от {get_cached_date()}"
-        )  # TODO: Кешировать дату
+            f"Список покупок от {datetime.today().strftime('%d.%m.%y')}"
+        )  # Стоит ли кешировать дату?
 
         if not ingredients_amount:
             pdf.drawString(

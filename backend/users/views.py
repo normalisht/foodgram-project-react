@@ -2,10 +2,11 @@ from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from recipes.serializers import UserFullDataSerializer
+
 from .models import User
 from .permissions import IsAuthor
 from .serializers import UserCreateSerializer, UserProfileSerializer

@@ -1,5 +1,5 @@
-from django.db.models import Case, When, BooleanField
-from django_filters.rest_framework import (FilterSet, BooleanFilter,
+from django.db.models import BooleanField, Case, When
+from django_filters.rest_framework import (BooleanFilter, FilterSet,
                                            ModelMultipleChoiceFilter)
 
 from .models import Recipe, Tag

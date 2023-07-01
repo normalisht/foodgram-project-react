@@ -4,8 +4,9 @@ from rest_framework import serializers
 from users.models import User
 from users.serializers import UserProfileSerializer
 from users.utils import is_subscribed
+
 from .fields import Base64ImageField
-from .models import Tag, Ingredient, Recipe, RecipeIngredient
+from .models import Ingredient, Recipe, RecipeIngredient, Tag
 
 
 class TagSerializer(serializers.ModelSerializer):
