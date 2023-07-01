@@ -45,13 +45,19 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
     ingredients = serializers.SerializerMethodField(read_only=True)
     author = UserProfileSerializer(read_only=True)
-
-    # TODO: Добавить поля is_favorited и is_in_shopping_cart
+    is_favorited = serializers.SerializerMethodField(read_only=True)
+    is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
-        fields = ('id', 'name', 'image', 'text', 'cooking_time', 'tags',
-                  'ingredients', 'author',)
+        fields = ('id', 'name', 'image', 'text', 'cooking_time', 'ingredients',
+                  'tags', 'author', 'is_favorited', 'is_in_shopping_cart')
+
+    def get_is_favorited(self, recipe):
+        return recipe.users_favorite.filter(id=recipe.author.id).exists()
+
+    def get_is_in_shopping_cart(self, recipe):
+        return recipe.users_shopping_carts.filter(id=recipe.author.id).exists()
 
     def get_ingredients(self, recipe):
         serializer = RecipeIngredientSerializer(
@@ -75,8 +81,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     def update(self, recipe, validated_data):
         # Согласно спецификации, обновление рецептов
         # должно быть реализовано через PATCH
-        recipe.tags.remove()
-        RecipeIngredient.objects.filter(recipe=recipe).delete()
+        recipe.tags.clear()
+        recipe.recipe_ingredient_model.all().delete()
 
         recipe_tags_connection(recipe, validated_data.pop('tags'))
         recipe_ingredients_connection(recipe,
@@ -84,6 +90,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
         for field, value in validated_data.items():
             setattr(recipe, field, value)
+        recipe.save()
 
         return recipe
 

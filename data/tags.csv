@@ -1,0 +1,15 @@
+name,color,slug
+Завтрак,#B39F7A,breakfast
+Обед,#AFEEEE,lunch
+Ужин,#F2E8C9,dinner
+ПП,#3EB489,pp
+Веганское,#77DD77,vegan
+Вегетарианское,#99FF99,vegetarian
+С курицей,#FADADD,chicken
+Со свининой,#FFCF48,pork
+C рыбой,#FAEEDD,fish
+С морепродуктами,#FF8C69,seafood
+Халяль,#7FB5B5,halal
+Русская кухня,#FAE7B5,russian
+Европейская кухня,#E6E6FA,european
+Американская кухня,#E4717A,american

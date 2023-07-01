@@ -4,13 +4,13 @@ from users.models import User
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=32, db_index=True)
     color = models.CharField(max_length=8)
     slug = models.SlugField(max_length=32)
 
 
 class Ingredient(models.Model):
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, db_index=True)
     measurement_unit = models.CharField(max_length=16)
 
 
@@ -28,14 +28,15 @@ class Recipe(models.Model):
     )
     text = models.TextField()
     cooking_time = models.IntegerField()
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag, db_index=True)
     ingredients = models.ManyToManyField(Ingredient,
                                          through='RecipeIngredient')
 
     # Хотел добавить эти поля в таблицу User, но ругается на циклический импорт
-    favorite_recipes = models.ManyToManyField(User,
-                                              related_name='favorite_recipes')
-    shopping_cart = models.ManyToManyField(User, related_name='shopping_cart')
+    users_favorite = models.ManyToManyField(User,
+                                            related_name='favorite_recipes')
+    users_shopping_carts = models.ManyToManyField(User,
+                                                  related_name='shopping_cart')
 
 
 class RecipeIngredient(models.Model):

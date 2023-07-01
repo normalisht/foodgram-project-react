@@ -3,6 +3,8 @@ from datetime import datetime
 
 from django.db.models import Sum
 from django.http import FileResponse
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
 from django.shortcuts import get_object_or_404
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
@@ -11,6 +13,7 @@ from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
 from users.utils import post_delete_action
+from .filters import RecipeFilter
 from .models import Tag, Ingredient, Recipe, RecipeIngredient
 from .serializers import (TagSerializer, IngredientSerializer,
                           RecipeSerializer, RecipeShortSerializer, )
@@ -28,6 +31,8 @@ class TagViewSet(RetrieveListViewSet):
 class IngredientViewSet(RetrieveListViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    filter_backends = (SearchFilter,)
+    search_fields = ('name',)
 
 
 class RecipeViewSet(ModelViewSet):
@@ -35,6 +40,8 @@ class RecipeViewSet(ModelViewSet):
         'recipe_ingredient_model__ingredient'
     ).all()
     serializer_class = RecipeSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
     @action(detail=True, methods=['post', 'delete'])
     def favorite(self, request, pk=None):
@@ -62,10 +69,18 @@ class RecipeViewSet(ModelViewSet):
         buffer = io.BytesIO()
         pdf = canvas.Canvas(buffer, pagesize=A4)
         pdf.setFont('Manrope', 14)
+
         pdf.drawString(
             25, h - 35,
             f"Список покупок от {datetime.today().strftime('%d.%m.%y')}"
         )  # TODO: Кешировать дату
+
+        if not ingredients_amount:
+            pdf.drawString(
+                25, h - 57,
+                f"Ваш список покупок пуст. Пора выбирать новый рецепт!"
+            )
+
         for index, ingredient in enumerate(ingredients_amount):
             pdf.drawString(
                 25, h - 57 - (index * 22),
@@ -76,6 +91,7 @@ class RecipeViewSet(ModelViewSet):
         pdf.showPage()
         pdf.save()
         buffer.seek(0)
+
         return FileResponse(buffer, as_attachment=True,
                             filename="shopping_cart.pdf")
 

@@ -17,7 +17,7 @@ class UserViewSet(DjoserUserViewSet):
 
     def get_queryset(self):
         if self.action == 'subscriptions':
-            return User.objects.filter(subscribers__user=self.request.user
+            return User.objects.filter(subscribers=self.request.user
                                        ).prefetch_related('recipes').all()
         return super().get_queryset()
 
@@ -44,7 +44,7 @@ class UserViewSet(DjoserUserViewSet):
                                   UserFullDataSerializer)
 
     @action(detail=False, methods=['get'])
-    def subscriptions(self, request):
+    def subscriptions(self, request, *args, **kwargs):
         """Список подписок. В get_serializer_class и get_queryset
         устанавливаются необходимые сериализатор и выборка."""
-        return super().list(request)
+        return super().list(request, *args, **kwargs)
