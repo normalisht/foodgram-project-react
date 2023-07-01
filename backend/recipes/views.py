@@ -12,11 +12,14 @@ from rest_framework.decorators import action
 from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
+from users.permissions import IsAuthor, ReadOnly
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from users.utils import post_delete_action
 from .filters import RecipeFilter
 from .models import Tag, Ingredient, Recipe, RecipeIngredient
 from .serializers import (TagSerializer, IngredientSerializer,
                           RecipeSerializer, RecipeShortSerializer, )
+from .utils import get_cached_date
 
 
 class RetrieveListViewSet(RetrieveModelMixin, ListModelMixin, GenericViewSet):
@@ -42,20 +45,24 @@ class RecipeViewSet(ModelViewSet):
     serializer_class = RecipeSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
+    permission_classes = [IsAdminUser | IsAuthor | ReadOnly]
 
-    @action(detail=True, methods=['post', 'delete'])
+    @action(detail=True, methods=['post', 'delete'],
+            permission_classes=[IsAuthenticated])
     def favorite(self, request, pk=None):
         recipe = get_object_or_404(Recipe, pk=pk)
         return post_delete_action(request, recipe, 'favorite_recipes',
                                   RecipeShortSerializer)
 
-    @action(detail=True, methods=['post', 'delete'])
+    @action(detail=True, methods=['post', 'delete'],
+            permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk=None):
         recipe = get_object_or_404(Recipe, pk=pk)
         return post_delete_action(request, recipe, 'shopping_cart',
                                   RecipeShortSerializer)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'],
+            permission_classes=[IsAuthenticated])
     def download_shopping_cart(self, request):
         ingredients_amount: dict = (
             RecipeIngredient.objects
@@ -72,7 +79,7 @@ class RecipeViewSet(ModelViewSet):
 
         pdf.drawString(
             25, h - 35,
-            f"Список покупок от {datetime.today().strftime('%d.%m.%y')}"
+            f"Список покупок от {get_cached_date()}"
         )  # TODO: Кешировать дату
 
         if not ingredients_amount:
