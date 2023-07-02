@@ -24,12 +24,10 @@ class Command(BaseCommand):
     help = "Loads data from somefiles.csv"
 
     def handle(self, *args, **options):
-        for model in MODELS:
-            if model.objects.exists():
-                print(model, ' data already loaded....')
-                print("Deleting data")
-                model.objects.all().delete()
-                print("Data is deleted")
-        print("Loading data")
         for file, model in zip(FILES, MODELS):
-            import_csv(f'static/data/{file}', model)
+            model_name = model._meta.model_name.capitalize()
+            if model.objects.exists():
+                print(f'{model_name} data already loaded')
+            else:
+                print(f"Loading data in {model_name}")
+                import_csv(f'static/data/{file}', model)

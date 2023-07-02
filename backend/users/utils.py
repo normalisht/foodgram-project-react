@@ -7,7 +7,8 @@ from rest_framework.serializers import Serializer
 
 def is_subscribed(user, author):
     """Проверяет подписан ли user на author"""
-    return user.subscriptions.filter(id=author.id).exists()
+    return (user.is_authenticated and
+            user.subscriptions.filter(id=author.id).exists())
 
 
 def post_delete_action(request, obj, related_name: str,

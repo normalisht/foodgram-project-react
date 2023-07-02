@@ -1,12 +1,11 @@
 from django.contrib import admin
 
-from recipes.models import Recipe, Tag, Ingredient, RecipeIngredient
+from .models import User
 
 
-class RecipeAdmin(admin.ModelAdmin):
-    list_filter = ('author', 'name', 'tags',)
+class UserAdmin(admin.ModelAdmin):
+    list_filter = ('email', 'username',)
+    search_fields = ('email', 'username')
 
 
-admin.site.register(Recipe, RecipeAdmin)
-admin.site.register(Tag)
-admin.site.register(Ingredient)
+admin.site.register(User, UserAdmin)
