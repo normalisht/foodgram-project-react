@@ -7,8 +7,8 @@ from rest_framework.serializers import Serializer
 
 def is_subscribed(user, author):
     """Проверяет подписан ли user на author"""
-    return (user.is_authenticated and
-            user.subscriptions.filter(id=author.id).exists())
+    return (user.is_authenticated
+            and user.subscriptions.filter(id=author.id).exists())
 
 
 def post_delete_action(request, obj, related_name: str,
@@ -22,7 +22,7 @@ def post_delete_action(request, obj, related_name: str,
     if request.method == 'POST':
         if getattr(user, related_name).filter(id=obj.id).exists():
             return Response(
-                {'error': f'This record already exists.'},
+                {'error': 'This record already exists.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         getattr(user, related_name).add(obj)

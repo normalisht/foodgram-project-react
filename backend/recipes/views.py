@@ -85,7 +85,7 @@ class RecipeViewSet(ModelViewSet):
         if not ingredients_amount:
             pdf.drawString(
                 25, h - 57,
-                f"Ваш список покупок пуст. Пора выбирать новый рецепт!"
+                "Ваш список покупок пуст. Пора выбирать новый рецепт!"
             )
 
         for index, ingredient in enumerate(ingredients_amount):
