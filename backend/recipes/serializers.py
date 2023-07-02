@@ -55,10 +55,14 @@ class RecipeSerializer(serializers.ModelSerializer):
                   'tags', 'author', 'is_favorited', 'is_in_shopping_cart')
 
     def get_is_favorited(self, recipe):
-        return recipe.users_favorite.filter(id=recipe.author.id).exists()
+        return recipe.users_favorite.filter(
+            id=self.context['request'].user.id
+        ).exists()
 
     def get_is_in_shopping_cart(self, recipe):
-        return recipe.users_shopping_carts.filter(id=recipe.author.id).exists()
+        return recipe.users_shopping_carts.filter(
+            id=self.context['request'].user.id
+        ).exists()
 
     def get_ingredients(self, recipe):
         serializer = RecipeIngredientSerializer(
