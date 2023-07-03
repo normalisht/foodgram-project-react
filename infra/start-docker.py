@@ -21,10 +21,10 @@ subprocess.run(['docker-compose', 'exec', 'backend', 'python',
                 'manage.py', 'migrate'])
 
 subprocess.run(['docker-compose', 'exec', 'backend', 'python',
-                'manage.py', 'collectstatic', '--noinput'])
+                'manage.py', 'load_data'])
 
 subprocess.run(['docker-compose', 'exec', 'backend', 'python',
-                'manage.py', 'load_data'])
+                'manage.py', 'collectstatic', '--noinput'])
 
 subprocess.run(['docker-compose', 'exec', 'backend', 'cp',
                 '-r', '/app/collected_static/.', '/backend_static/static/'])
