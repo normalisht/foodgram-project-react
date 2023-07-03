@@ -1,8 +1,8 @@
 from django.db.models import BooleanField, Case, When
 from django_filters.rest_framework import (BooleanFilter, FilterSet,
                                            ModelMultipleChoiceFilter)
-
-from .models import Recipe, Tag
+from rest_framework.filters import SearchFilter
+from .models import Recipe, Tag, Ingredient
 
 
 class RecipeFilter(FilterSet):

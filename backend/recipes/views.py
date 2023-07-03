@@ -35,7 +35,7 @@ class IngredientViewSet(RetrieveListViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     filter_backends = (SearchFilter,)
-    search_fields = ('name',)
+    search_fields = ('^name',)
 
 
 class RecipeViewSet(ModelViewSet):
