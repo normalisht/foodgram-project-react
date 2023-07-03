@@ -122,5 +122,6 @@ DJOSER = {
     'LOGIN_FIELD': 'email'
 }
 
-pdfmetrics.registerFont(TTFont('Manrope',
-                               BASE_DIR / 'static/fonts/Manrope.ttf'))
+pdfmetrics.registerFont(
+    TTFont('Manrope', BASE_DIR / 'static/fonts/Manrope.ttf')
+)
