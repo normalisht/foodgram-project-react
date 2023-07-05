@@ -11,11 +11,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'foodgram-final.ddns.net']
 
 CSRF_COOKIE_DOMAIN = 'foodgram-final.ddns.net'
+CSRF_COOKIE_SECURE = False
+CSRF_TRUSTED_ORIGINS = [
+    'https://localhost',
+    'https://127.0.0.1',
+    'https://foodgram-final.ddns.net'
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
