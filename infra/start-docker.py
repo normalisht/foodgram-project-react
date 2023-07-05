@@ -3,9 +3,9 @@ from time import sleep
 
 SUCCESS_LAUNCH = 'All processes up and running\r\n'
 
-subprocess.run(['pip', 'install', 'docker-compose-wait'])
-subprocess.run(['docker-compose', 'stop'])
-subprocess.run(['docker-compose', 'up', '-d', '--build'])
+subprocess.run('pip install docker-compose-wait'.split(' '))
+subprocess.run('docker-compose stop'.split(' '))
+subprocess.run('docker-compose up -d --build'.split(' '))
 
 result = subprocess.run(['docker-compose-wait', '-f', 'docker-compose.yml'],
                         stdout=subprocess.PIPE)
