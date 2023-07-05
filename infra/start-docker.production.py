@@ -7,22 +7,18 @@ from dotenv import load_dotenv
 SUCCESS_LAUNCH = 'All processes up and running\r\n'
 DOCKER_COMPOSE_COMMAND = ['sudo', 'docker', 'compose', '-f',
                           'docker-compose.production.yml']
+DOCKER_WAIT_COMMAND = ['sudo', 'docker-compose-wait', '-f',
+                       'docker-compose.production.yml']
 
 subprocess.run(['pip', 'install', 'docker-compose-wait'])
 subprocess.run([*DOCKER_COMPOSE_COMMAND, 'down'])
 subprocess.run([*DOCKER_COMPOSE_COMMAND, 'up', '-d'])
 
-result = subprocess.run(
-    ['docker-compose-wait', '-f', 'docker-compose.production.yml'],
-    stdout=subprocess.PIPE
-)
+result = subprocess.run(DOCKER_WAIT_COMMAND, stdout=subprocess.PIPE)
 
 while result.stdout.decode('UTF-8') != SUCCESS_LAUNCH:
     sleep(1)
-    result = subprocess.run(
-        ['docker-compose-wait', '-f', 'docker-compose.production.yml'],
-        stdout=subprocess.PIPE
-    )
+    result = subprocess.run(DOCKER_WAIT_COMMAND, stdout=subprocess.PIPE)
 
 subprocess.run([*DOCKER_COMPOSE_COMMAND, 'exec', 'backend', 'python',
                 'manage.py', 'migrate'])
