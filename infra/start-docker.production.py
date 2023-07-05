@@ -22,6 +22,7 @@ SUCCESS_LAUNCH = 'All processes up and running\r\n'
 DOCKER_COMPOSE_COMMAND = ['sudo', 'docker', 'compose', '-f',
                           'docker-compose.production.yml']
 
+subprocess.run([*DOCKER_COMPOSE_COMMAND, 'pull'])
 subprocess.run([*DOCKER_COMPOSE_COMMAND, 'down'])
 subprocess.run([*DOCKER_COMPOSE_COMMAND, 'up', '-d'])
 
