@@ -18,7 +18,7 @@ class UniqueAttrValidator:
 
         if len(all_values) > len(set(all_values)):
             raise serializers.ValidationError(
-                self.message or
-                f'Field {self.field} has duplicate '
-                f'values {"__".join(self.attrs)}'
+                self.message
+                or f'Field {self.field} has duplicate '
+                   f'values {"__".join(self.attrs)}'
             )
