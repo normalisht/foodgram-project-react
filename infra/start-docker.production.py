@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 SUCCESS_LAUNCH = 'All processes up and running\r\n'
 DOCKER_COMPOSE_COMMAND = ['sudo', 'docker', 'compose', '-f',
                           'docker-compose.production.yml']
-print(*DOCKER_COMPOSE_COMMAND)
 
 subprocess.run(['pip', 'install', 'docker-compose-wait'])
 subprocess.run([*DOCKER_COMPOSE_COMMAND, 'down'])
