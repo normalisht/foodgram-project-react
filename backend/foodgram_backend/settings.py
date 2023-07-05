@@ -17,10 +17,6 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'foodgram-final.ddns.net']
 
 CSRF_COOKIE_DOMAIN = 'foodgram-final.ddns.net'
 
-CSRF_TRUSTED_ORIGINS = ['https://foodgram-final.ddns.net',
-                        'https://localhost',
-                        'https://127.0.0.1']
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
