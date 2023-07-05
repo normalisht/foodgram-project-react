@@ -1,14 +1,11 @@
 from django.contrib import admin
-from django.forms.models import BaseInlineFormSet
 from django.core.exceptions import ValidationError
+from django.forms.models import BaseInlineFormSet
 
-from recipes.models import Recipe, Tag, Ingredient
+from recipes.models import Ingredient, Recipe, Tag
 
 
 class RequiredInlineFormSet(BaseInlineFormSet):
-    # Спасибо ChatGPT за помощь с обязательным добавление ингредиентов
-    # и поиск по ним
-
     def clean(self):
         super().clean()
         has_ingredients = False

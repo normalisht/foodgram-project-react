@@ -1,12 +1,15 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-%juq@w-fxpo_*%5@xfbzt91j(&%2fuiu2&(e$23!&ld7m@xb=2'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = True
 

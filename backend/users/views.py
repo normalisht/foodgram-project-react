@@ -6,7 +6,6 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 
 from recipes.serializers import UserFullDataSerializer
-
 from .models import User
 from .permissions import IsAuthor
 from .serializers import UserCreateSerializer, UserProfileSerializer

@@ -9,12 +9,12 @@ class Tag(models.Model):
     color = models.CharField(max_length=8, verbose_name='Цвет (HEX код)')
     slug = models.SlugField(max_length=32)
 
-    def __str__(self):
-        return f'{self.name}'
-
     class Meta:
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
+
+    def __str__(self):
+        return f'{self.name}'
 
 
 class Ingredient(models.Model):
@@ -23,12 +23,12 @@ class Ingredient(models.Model):
     measurement_unit = models.CharField(max_length=16,
                                         verbose_name='Единицы измерения')
 
-    def __str__(self):
-        return f'{self.name} ({self.measurement_unit})'
-
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+
+    def __str__(self):
+        return f'{self.name} ({self.measurement_unit})'
 
 
 class Recipe(models.Model):
@@ -50,9 +50,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredient, verbose_name='Ингредиенты', through='RecipeIngredient'
     )
-
-    # Хотел добавить эти поля в таблицу User, но ругается на циклический импорт
-    users_favorite = models.ManyToManyField(
+    users_favorites = models.ManyToManyField(
         User, blank=True, related_name='favorite_recipes',
         verbose_name='Избранное у ...'
     )
@@ -61,13 +59,13 @@ class Recipe(models.Model):
         verbose_name='В списке покупок у ...'
     )
 
-    def __str__(self):
-        return f'{self.name}: {self.author.username}'
-
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
         ordering = ('-id',)
+
+    def __str__(self):
+        return f'{self.name}: {self.author.username}'
 
 
 class RecipeIngredient(models.Model):
@@ -81,9 +79,15 @@ class RecipeIngredient(models.Model):
     )
     amount = models.PositiveIntegerField(verbose_name='Кол-во')
 
-    def __str__(self):
-        return f'{self.recipe.name}'
-
     class Meta:
         verbose_name = 'Ингредиент для рецепта'
         verbose_name_plural = 'Ингредиенты для рецептов'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'ingredient'],
+                name='unique_ingredient_in_recipe'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.recipe.name}'

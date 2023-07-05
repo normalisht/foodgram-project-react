@@ -1,29 +1,22 @@
 import io
-from datetime import datetime
 
 from django.db.models import Sum
 from django.http import FileResponse
-from django.shortcuts import get_object_or_404
+from django.utils.timezone import localdate
 from django_filters.rest_framework import DjangoFilterBackend
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.viewsets import ModelViewSet
 
 from users.permissions import IsAuthor, ReadOnly
-from users.utils import post_delete_action
-
 from .filters import RecipeFilter
+from .mixins import RetrieveListViewSet
 from .models import Ingredient, Recipe, RecipeIngredient, Tag
-from .serializers import (IngredientSerializer, RecipeSerializer,
-                          RecipeShortSerializer, TagSerializer)
-
-
-class RetrieveListViewSet(RetrieveModelMixin, ListModelMixin, GenericViewSet):
-    pagination_class = None
+from .serializers import IngredientSerializer, RecipeSerializer, TagSerializer
+from .utils2 import post_delete_action_for_recipe_obj
 
 
 class TagViewSet(RetrieveListViewSet):
@@ -50,16 +43,16 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def favorite(self, request, pk=None):
-        recipe = get_object_or_404(Recipe, pk=pk)
-        return post_delete_action(request, recipe, 'favorite_recipes',
-                                  RecipeShortSerializer)
+        return post_delete_action_for_recipe_obj(
+            request, 'favorite_recipes', pk
+        )
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk=None):
-        recipe = get_object_or_404(Recipe, pk=pk)
-        return post_delete_action(request, recipe, 'shopping_cart',
-                                  RecipeShortSerializer)
+        return post_delete_action_for_recipe_obj(
+            request, 'shopping_cart', pk
+        )
 
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
@@ -69,7 +62,7 @@ class RecipeViewSet(ModelViewSet):
             .filter(recipe__in=request.user.shopping_cart.all())
             .select_related('ingredient')
             .values('ingredient__name', 'ingredient__measurement_unit')
-            .annotate(amount=Sum('amount'))
+            .annotate(amount_sum=Sum('amount'))
         )
 
         w, h = A4
@@ -79,8 +72,8 @@ class RecipeViewSet(ModelViewSet):
 
         pdf.drawString(
             25, h - 35,
-            f"Список покупок от {datetime.today().strftime('%d.%m.%y')}"
-        )  # Стоит ли кешировать дату?
+            f"Список покупок от {localdate().strftime('%d.%m.%y')}"
+        )
 
         if not ingredients_amount:
             pdf.drawString(
@@ -92,7 +85,7 @@ class RecipeViewSet(ModelViewSet):
             pdf.drawString(
                 25, h - 57 - (index * 22),
                 f"{ingredient.get('ingredient__name')} - "
-                f"{ingredient.get('amount')} "
+                f"{ingredient.get('amount_sum')} "
                 f"({ingredient.get('ingredient__measurement_unit')})"
             )
         pdf.showPage()
@@ -103,9 +96,4 @@ class RecipeViewSet(ModelViewSet):
                             filename="shopping_cart.pdf")
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user,
-                        tags=self.request.data.get('tags'),
-                        ingredients=self.request.data.get('ingredients'))
-
-    def perform_update(self, serializer):
-        self.perform_create(serializer)
+        serializer.save(author=self.request.user)

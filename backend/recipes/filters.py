@@ -15,23 +15,14 @@ class RecipeFilter(FilterSet):
 
     class Meta:
         model = Recipe
-        fields = ('tags', 'is_favorited',)
+        fields = ('tags', 'is_favorited', 'is_in_shopping_cart')
 
     def filter_is_favorited(self, queryset, name, value):
-        # ChatGpt помог, но наверное должен быть способ проще
-        return queryset.annotate(
-            is_favorited=Case(
-                When(users_favorite=self.request.user, then=True),
-                default=False,
-                output_field=BooleanField()
-            )
-        ).filter(is_favorited=value)
+        if self.request.user.is_authenticated:
+            return queryset.filter(users_favorites=self.request.user)
+        return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
-        return queryset.annotate(
-            is_in_shopping_cart=Case(
-                When(users_shopping_carts=self.request.user, then=True),
-                default=False,
-                output_field=BooleanField()
-            )
-        ).filter(is_in_shopping_cart=value)
+        if self.request.user.is_authenticated:
+            return queryset.filter(users_shopping_carts=self.request.user)
+        return queryset

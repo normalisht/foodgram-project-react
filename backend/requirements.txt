@@ -11,6 +11,7 @@ django-templated-mail==1.1.1
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 djoser==2.2.0
+docker-compose-wait==1.2.2
 idna==3.4
 isort==5.12.0
 oauthlib==3.2.2
@@ -18,6 +19,7 @@ Pillow==9.5.0
 psycopg2-binary==2.9.3
 pycparser==2.21
 PyJWT==2.7.0
+python-dotenv==1.0.0
 python3-openid==3.2.0
 pytz==2023.3
 PyYAML==6.0
