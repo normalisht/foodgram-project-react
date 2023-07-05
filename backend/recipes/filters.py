@@ -1,4 +1,3 @@
-from django.db.models import BooleanField, Case, When
 from django_filters.rest_framework import (BooleanFilter, FilterSet,
                                            ModelMultipleChoiceFilter)
 
