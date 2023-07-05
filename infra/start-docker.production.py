@@ -2,18 +2,33 @@ import os
 import subprocess
 from time import sleep
 
+import docker
 from dotenv import load_dotenv
+
+
+def check_docker_compose():
+    client = docker.from_env()
+    containers = client.containers.list()
+
+    for container in containers:
+        labels = container.labels
+        if 'com.docker.compose.project' in labels:
+            return True
+
+    return False
+
 
 SUCCESS_LAUNCH = 'All processes up and running\r\n'
 DOCKER_COMPOSE_COMMAND = ['sudo', 'docker', 'compose', '-f',
                           'docker-compose.production.yml']
-DOCKER_WAIT_COMMAND = ['wait-for-docker', '&&']
 
-subprocess.run(['pip', 'install', 'wait-for-docker'])
 subprocess.run([*DOCKER_COMPOSE_COMMAND, 'down'])
 subprocess.run([*DOCKER_COMPOSE_COMMAND, 'up', '-d'])
 
-subprocess.run([*DOCKER_WAIT_COMMAND, *DOCKER_COMPOSE_COMMAND, 'exec',
+while not check_docker_compose():
+    sleep(1)
+
+subprocess.run([*DOCKER_COMPOSE_COMMAND, 'exec',
                 'backend', 'python', 'manage.py', 'migrate'])
 
 subprocess.run([*DOCKER_COMPOSE_COMMAND, 'exec', 'backend', 'python',
