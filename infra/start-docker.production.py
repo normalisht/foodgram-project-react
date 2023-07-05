@@ -1,6 +1,7 @@
+import os
 import subprocess
 from time import sleep
-import os
+
 from dotenv import load_dotenv
 
 SUCCESS_LAUNCH = 'All processes up and running\r\n'

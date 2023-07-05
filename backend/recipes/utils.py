@@ -11,7 +11,7 @@ def recipe_tags_connection(recipe, tags):
     try:
         recipe.tags.set(tags)
     except IntegrityError as error:
-        incorrect_id = re.findall('\(tag_id\)=\(\d+\)', str(error))[0]
+        incorrect_id = re.findall(r'\(tag_id\)=\(\d+\)', str(error))[0]
         raise serializers.ValidationError(
             f'Not found {incorrect_id}'
         )
@@ -31,7 +31,7 @@ def recipe_ingredients_connection(recipe, ingredients):
     try:
         RecipeIngredient.objects.bulk_create(recipe_ingredients)
     except IntegrityError as error:
-        incorrect_id = re.findall('\(ingredient_id\)=\(\d+\)', str(error))[0]
+        incorrect_id = re.findall(r'\(ingredient_id\)=\(\d+\)', str(error))[0]
         raise serializers.ValidationError(
             f'Not found {incorrect_id}'
         )
