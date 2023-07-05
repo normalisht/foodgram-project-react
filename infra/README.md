@@ -16,6 +16,3 @@ cd infra
 ```bash
 python start-docker.py
 ```
-
-!!! В ходе выполнения скрипта будет установлена библиотека
-docker-compose-wait. 
