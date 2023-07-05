@@ -107,7 +107,9 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          source: "infra/docker-compose.production.yml"
+          source: |
+            "infra/docker-compose.production.yml"
+            "infra/start-docker.production.py"
           target: "foodgram/infra"
 
       - name: Executing remote ssh commands to deploy
@@ -117,7 +119,7 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          script: python foodgram/infra/start-docker.production.py
+          script: python3 foodgram/infra/start-docker.production.py
 
   send_message:
     runs-on: ubuntu-latest
