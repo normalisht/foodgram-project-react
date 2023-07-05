@@ -15,8 +15,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'foodgram-final.ddns.net']
 
-CSRF_COOKIE_DOMAIN = 'foodgram-final.ddns.net'
-CSRF_COOKIE_SECURE = False
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO','https')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
