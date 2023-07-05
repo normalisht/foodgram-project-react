@@ -127,7 +127,9 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          script: python3 foodgram/infra/start-docker.production.py
+          script: |
+            cd foodgram/infra/
+            python3 start-docker.production.py
 
   send_message:
     runs-on: ubuntu-latest
