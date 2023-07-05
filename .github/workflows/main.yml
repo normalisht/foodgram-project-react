@@ -139,7 +139,7 @@ jobs:
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd foodgram/infra/
-            python3 start-docker.production.py
+            sudo python3 start-docker.production.py
 
   send_message:
     runs-on: ubuntu-latest
