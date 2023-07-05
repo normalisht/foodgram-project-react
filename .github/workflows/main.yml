@@ -77,11 +77,6 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
-        run: |
-          cd frontend/
-          npm i
-
       - name: Test frontend
         run: |
           cd frontend/
