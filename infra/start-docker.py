@@ -16,7 +16,6 @@ def check_docker_compose():
     return False
 
 
-subprocess.run('pip install wait-for-docker'.split(' '))
 subprocess.run('docker-compose stop'.split(' '))
 subprocess.run('docker-compose up -d --build'.split(' '))
 
