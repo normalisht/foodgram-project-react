@@ -5,7 +5,6 @@ from users.serializers import UserProfileSerializer
 from users.utils import is_subscribed
 from .fields import Base64ImageField
 from .models import Ingredient, Recipe, RecipeIngredient, Tag
-from .utils import recipe_ingredients_connection, recipe_tags_connection
 from .validators import UniqueAttrValidator
 
 
@@ -39,7 +38,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         fields = ('id', 'amount', 'name', 'measurement_unit')
 
 
-class RecipeSerializer(serializers.ModelSerializer):
+class RecipeReadSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
     tags = TagSerializer(many=True, read_only=True)
     ingredients = RecipeIngredientSerializer(
@@ -54,14 +53,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ('id', 'name', 'image', 'text', 'cooking_time', 'ingredients',
                   'tags', 'author', 'is_favorited', 'is_in_shopping_cart')
-        validators = [
-            UniqueAttrValidator(
-                queryset=Recipe.objects.all(),
-                field='recipe_ingredient_model',
-                attrs='ingredient__id',
-                message='Recipe ingredients cannot be duplicated'
-            )
-        ]
 
     def get_is_favorited(self, recipe):
         return recipe.users_favorites.filter(
@@ -73,14 +64,52 @@ class RecipeSerializer(serializers.ModelSerializer):
             id=self.context['request'].user.id
         ).exists()
 
+
+class RecipeWriteSerializer(serializers.ModelSerializer):
+    image = Base64ImageField()
+    tags = serializers.ListField(child=serializers.IntegerField(min_value=1))
+    ingredients = RecipeIngredientSerializer(
+        many=True,
+        source='recipe_ingredient_model'
+    )
+
+    class Meta:
+        model = Recipe
+        fields = ('name', 'image', 'text', 'cooking_time', 'ingredients',
+                  'tags',)
+        validators = [
+            UniqueAttrValidator(
+                queryset=Recipe.objects.all(),
+                field='recipe_ingredient_model',
+                attrs='ingredient__id',
+                message='Recipe ingredients cannot be duplicated'
+            )
+        ]
+
+    def validate_tags(self, tags):
+        return Tag.objects.filter(id__in=tags).values_list('id', flat=True)
+
+    def validate_ingredients(self, ingredients):
+        id_list = [item.get('ingredient').get('id') for item in ingredients]
+
+        if len(id_list) > len(set(id_list)):
+            raise serializers.ValidationError(
+                'Ingredients cannot be repeated.'
+            )
+
+        if Ingredient.objects.filter(id__in=id_list).count() != len(id_list):
+            raise serializers.ValidationError('Some ingredients not found.')
+
+        return ingredients
+
     def create(self, validated_data):
         ingredients = validated_data.pop('recipe_ingredient_model')
-        tags = self.initial_data.get('tags')
+        tags = validated_data.pop('tags')
 
         recipe = Recipe.objects.create(**validated_data)
 
-        recipe_tags_connection(recipe, tags)
-        recipe_ingredients_connection(recipe, ingredients)
+        recipe.tags.set(tags)
+        self.recipe_ingredients_connection(recipe, ingredients)
 
         return recipe
 
@@ -88,12 +117,29 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe.tags.clear()
         recipe.recipe_ingredient_model.all().delete()
 
-        recipe_tags_connection(recipe, self.initial_data.get('tags'))
-        recipe_ingredients_connection(
+        recipe.tags.set(validated_data.pop('tags'))
+        self.recipe_ingredients_connection(
             recipe, validated_data.pop('recipe_ingredient_model')
         )
 
         return super().update(recipe, validated_data)
+
+    def to_representation(self, recipe):
+        return RecipeReadSerializer(context=self.context
+                                    ).to_representation(recipe)
+
+    def recipe_ingredients_connection(self, recipe, ingredients):
+        """Добавляет ингредиенты к рецепту."""
+        recipe_ingredients = []
+        for ingredient_data in ingredients:
+            ingredient = ingredient_data.get('ingredient')
+            recipe_ingredients.append(
+                RecipeIngredient(
+                    ingredient_id=ingredient.get('id'), recipe=recipe,
+                    amount=ingredient_data.get('amount')
+                )
+            )
+        RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
 
 class UserFullDataSerializer(serializers.ModelSerializer):

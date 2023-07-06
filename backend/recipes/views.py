@@ -15,8 +15,9 @@ from users.permissions import IsAuthor, ReadOnly
 from .filters import RecipeFilter
 from .mixins import RetrieveListViewSet
 from .models import Ingredient, Recipe, RecipeIngredient, Tag
-from .serializers import IngredientSerializer, RecipeSerializer, TagSerializer
-from .utils2 import post_delete_action_for_recipe_obj
+from .serializers import (IngredientSerializer, RecipeReadSerializer,
+                          TagSerializer, RecipeWriteSerializer)
+from .utils import post_delete_action_for_recipe_obj
 
 
 class TagViewSet(RetrieveListViewSet):
@@ -35,10 +36,15 @@ class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.prefetch_related(
         'recipe_ingredient_model__ingredient'
     ).all()
-    serializer_class = RecipeSerializer
+    serializer_class = RecipeReadSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
     permission_classes = [IsAdminUser | IsAuthor | ReadOnly]
+
+    def get_serializer_class(self):
+        if self.action in ('create', 'update', 'partial_update'):
+            return RecipeWriteSerializer
+        return super().get_serializer_class()
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])

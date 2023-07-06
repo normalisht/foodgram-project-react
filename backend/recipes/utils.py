@@ -1,37 +1,11 @@
-import re
+from django.shortcuts import get_object_or_404
 
-from django.db.utils import IntegrityError
-from rest_framework import serializers
-
-from .models import RecipeIngredient
-
-
-def recipe_tags_connection(recipe, tags):
-    """Добавляет теги к рецепту."""
-    try:
-        recipe.tags.set(tags)
-    except IntegrityError as error:
-        incorrect_id = re.findall(r'\(tag_id\)=\(\d+\)', str(error))[0]
-        raise serializers.ValidationError(
-            f'Not found {incorrect_id}'
-        )
+from users.utils import post_delete_action
+from .models import Recipe
+from .serializers import RecipeShortSerializer
 
 
-def recipe_ingredients_connection(recipe, ingredients):
-    """Добавляет ингредиенты к рецепту."""
-    recipe_ingredients = []
-    for ingredient_data in ingredients:
-        ingredient = ingredient_data.get('ingredient')
-        recipe_ingredients.append(
-            RecipeIngredient(
-                ingredient_id=ingredient.get('id'), recipe=recipe,
-                amount=ingredient_data.get('amount')
-            )
-        )
-    try:
-        RecipeIngredient.objects.bulk_create(recipe_ingredients)
-    except IntegrityError as error:
-        incorrect_id = re.findall(r'\(ingredient_id\)=\(\d+\)', str(error))[0]
-        raise serializers.ValidationError(
-            f'Not found {incorrect_id}'
-        )
+def post_delete_action_for_recipe_obj(request, related_name: str, obj_id: int):
+    recipe = get_object_or_404(Recipe, pk=obj_id)
+    return post_delete_action(request, recipe, related_name,
+                              RecipeShortSerializer)

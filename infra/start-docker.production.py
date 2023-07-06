@@ -22,12 +22,18 @@ SUCCESS_LAUNCH = 'All processes up and running\r\n'
 DOCKER_COMPOSE_COMMAND = ['sudo', 'docker', 'compose', '-f',
                           'docker-compose.production.yml']
 
+try_count = 0
+
 subprocess.run([*DOCKER_COMPOSE_COMMAND, 'pull'])
 subprocess.run([*DOCKER_COMPOSE_COMMAND, 'down'])
 subprocess.run([*DOCKER_COMPOSE_COMMAND, 'up', '-d'])
 
 while not check_docker_compose():
     sleep(1)
+    try_count += 1
+
+    if try_count > 300:
+        raise Exception('Docker launch too long!')
 
 subprocess.run([*DOCKER_COMPOSE_COMMAND, 'exec',
                 'backend', 'python', 'manage.py', 'migrate'])

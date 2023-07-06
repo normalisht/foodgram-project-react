@@ -16,8 +16,6 @@ def check_docker_compose():
     return False
 
 
-SUCCESS_LAUNCH = 'All processes up and running\r\n'
-
 subprocess.run('pip install wait-for-docker'.split(' '))
 subprocess.run('docker-compose stop'.split(' '))
 subprocess.run('docker-compose up -d --build'.split(' '))
