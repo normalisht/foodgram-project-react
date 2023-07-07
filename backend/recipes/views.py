@@ -1,7 +1,8 @@
-import io
+from io import BytesIO
 
 from django.db.models import Sum
 from django.http import FileResponse
+from django.shortcuts import get_object_or_404
 from django.utils.timezone import localdate
 from django_filters.rest_framework import DjangoFilterBackend
 from reportlab.lib.pagesizes import A4
@@ -12,12 +13,13 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from users.permissions import IsAuthor, ReadOnly
+from users.utils import post_delete_action
 from .filters import RecipeFilter
 from .mixins import RetrieveListViewSet
 from .models import Ingredient, Recipe, RecipeIngredient, Tag
 from .serializers import (IngredientSerializer, RecipeReadSerializer,
-                          TagSerializer, RecipeWriteSerializer)
-from .utils import post_delete_action_for_recipe_obj
+                          TagSerializer, RecipeWriteSerializer,
+                          RecipeShortSerializer)
 
 
 class TagViewSet(RetrieveListViewSet):
@@ -49,14 +51,14 @@ class RecipeViewSet(ModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def favorite(self, request, pk=None):
-        return post_delete_action_for_recipe_obj(
+        return self.post_delete_action_for_recipe_obj(
             request, 'favorite_recipes', pk
         )
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, pk=None):
-        return post_delete_action_for_recipe_obj(
+        return self.post_delete_action_for_recipe_obj(
             request, 'shopping_cart', pk
         )
 
@@ -72,7 +74,7 @@ class RecipeViewSet(ModelViewSet):
         )
 
         w, h = A4
-        buffer = io.BytesIO()
+        buffer = BytesIO()
         pdf = canvas.Canvas(buffer, pagesize=A4)
         pdf.setFont('Manrope', 14)
 
@@ -103,3 +105,9 @@ class RecipeViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    def post_delete_action_for_recipe_obj(self, request, related_name: str,
+                                          obj_id: int):
+        recipe = get_object_or_404(Recipe, pk=obj_id)
+        return post_delete_action(request, recipe, related_name,
+                                  RecipeShortSerializer)

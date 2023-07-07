@@ -67,7 +67,8 @@ class RecipeReadSerializer(serializers.ModelSerializer):
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
-    tags = serializers.ListField(child=serializers.IntegerField(min_value=1))
+    tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(),
+                                              many=True)
     ingredients = RecipeIngredientSerializer(
         many=True,
         source='recipe_ingredient_model'
@@ -85,9 +86,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                 message='Recipe ingredients cannot be duplicated'
             )
         ]
-
-    def validate_tags(self, tags):
-        return Tag.objects.filter(id__in=tags).values_list('id', flat=True)
 
     def validate_ingredients(self, ingredients):
         id_list = [item.get('ingredient').get('id') for item in ingredients]
