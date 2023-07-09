@@ -141,8 +141,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
 
 class UserFullDataSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
-    recipes = RecipeShortSerializer(many=True, read_only=True)
+    recipes = serializers.SerializerMethodField(read_only=True)
     recipes_count = serializers.SerializerMethodField(read_only=True)
     is_subscribed = serializers.SerializerMethodField(read_only=True)
 
@@ -156,3 +155,9 @@ class UserFullDataSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, author):
         return is_subscribed(self.context['request'].user, author)
+
+    def get_recipes(self, user):
+        limit = self.context['request'].query_params.get('recipes_limit')
+        recipes = (user.recipes.all()[:int(limit)] if limit is not None
+                   else user.recipes.all())
+        return RecipeShortSerializer(recipes, many=True).data
